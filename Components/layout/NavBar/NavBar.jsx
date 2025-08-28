@@ -1,3 +1,4 @@
+"use client";
 import {
   ChevronRight,
   Ellipsis,
@@ -7,10 +8,13 @@ import {
   ShoppingCart,
   User,
 } from "lucide-react";
+import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import React from "react";
 
 export default function NavBar() {
+  const { data, status } = useSession();
   const links = (
     <>
       <li>
@@ -45,6 +49,10 @@ export default function NavBar() {
       </li>
     </>
   );
+  const pathname = usePathname();
+  const isDashboard = pathname.startsWith("/dashboard");
+
+  if (isDashboard) return null; // Hide navbar on dashboard
   return (
     <div>
       <div className="bg-[#362f2f] flex items-center justify-center h-7 py-4">
@@ -63,7 +71,7 @@ export default function NavBar() {
             {/* Navbar */}
             <div className="navbar w-full flex items-center justify-between">
               <div className="flex text-2xl text-[#1E1E1E] font-bold uppercase">
-                Oliyo
+                <Link href={"/"}>Oliyo</Link>
               </div>
               <div className="flex-none lg:hidden">
                 <label
@@ -84,15 +92,37 @@ export default function NavBar() {
               </div>
               <div className="hidden lg:flex">
                 <div className="flex items-center gap-4">
-                  <p>
+                  {/* <p>
                     <Search />
-                  </p>
-                  <p>
-                    <Link href={"../../../app/Auth/SignIn"}>
-                      <User />
-                    </Link>
-                  </p>
-                  <p>
+                  </p> */}
+                  <ul>
+                    {status === "authenticated" ? (
+                      <div className="dropdown">
+                        <div tabIndex={0} role="button" className="btn m-1">
+                          Click
+                        </div>
+                        <ul
+                          tabIndex={0}
+                          className="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm"
+                        >
+                          <li className="cursor-pointer">
+                            <Link href="/dashboard">Dashboard</Link>
+                          </li>
+                          <li
+                            onClick={() => signOut()}
+                            className="cursor-pointer"
+                          >
+                            <a>Log Out</a>
+                          </li>
+                        </ul>
+                      </div>
+                    ) : (
+                      <Link href="/sign-in">
+                        <User />
+                      </Link>
+                    )}
+                  </ul>
+                  {/* <p>
                     <Heart />
                   </p>
                   <p>
@@ -100,7 +130,7 @@ export default function NavBar() {
                   </p>
                   <p>
                     <Ellipsis />
-                  </p>
+                  </p> */}
                 </div>
               </div>
             </div>
@@ -123,4 +153,8 @@ export default function NavBar() {
       </div>
     </div>
   );
+}
+
+{
+  /* <li className="cursor-pointer">Log Out</li>; */
 }
